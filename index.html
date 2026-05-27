@@ -59,7 +59,7 @@
         <div id="pagination" class="flex justify-center items-center gap-2 mt-8 flex-wrap"></div>
 
         <div class="text-center text-gray-500 text-xs mt-6">
-            每 5 分钟自动刷新一次 · 方案4（手机优化版）
+            每 5 分钟自动刷新一次 · 方案1（已优化分页）
         </div>
     </div>
 
@@ -67,7 +67,7 @@
         let allStocks = [];
         let filteredStocks = [];
         let currentPage = 1;
-        const itemsPerPage = 50;   // 改成50条/页，分页更友好
+        const itemsPerPage = 50;   // ←←← 改成50条/页，现在分页会更多
 
         function calcChange(current, previous) {
             if (!previous || previous === 0 || previous === null) return { value: '新上榜', color: 'text-yellow-400' };
@@ -119,6 +119,7 @@
                         : `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">${i}</button>`;
                 }
             } else {
+                // 省略版分页逻辑（保持不变）
                 if (currentPage === 1) pagesHtml += `<button class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium min-w-[40px]">1</button>`;
                 else pagesHtml += `<button onclick="goToPage(1)" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">1</button>`;
                 if (currentPage > 4) pagesHtml += `<span class="px-2 text-gray-500 font-medium">...</span>`;
@@ -133,6 +134,7 @@
                 if (currentPage === totalPages) pagesHtml += `<button class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium min-w-[40px]">${totalPages}</button>`;
                 else pagesHtml += `<button onclick="goToPage(${totalPages})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">${totalPages}</button>`;
             }
+
             pagesHtml += `<button onclick="goToPage(${currentPage + 1})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-sm font-medium ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>`;
 
             pagination.innerHTML = `
@@ -157,30 +159,44 @@
         async function fetchData() {
             try {
                 const baseApi = 'https://apewisdom.io/api/v1.0/filter/all-stocks';
-                const getProxyUrl = (url) => `https://corsproxy.io/?${encodeURIComponent(url)}&t=${Date.now()}`;
+                const getProxyUrl = (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`;
 
-                console.log('🚀 开始抓取...');
+                console.log('🚀 开始抓取数据...');
 
                 const firstRes = await fetch(getProxyUrl(baseApi));
                 if (!firstRes.ok) throw new Error('第一页失败');
                 const firstData = await firstRes.json();
 
                 let allStocks = firstData.results || [];
-                const totalPages = firstData.pages || 15;
+                const totalPages = firstData.pages || 15;   // 直接用API返回的页数
+
+                console.log(`📄 API 共有 ${totalPages} 页，准备并行抓取...`);
 
                 const pagePromises = [];
                 for (let page = 2; page <= totalPages; page++) {
                     const pageUrl = `https://apewisdom.io/api/v1.0/filter/all-stocks/page/${page}`;
                     pagePromises.push(
                         fetch(getProxyUrl(pageUrl))
-                            .then(res => res.ok ? res.json() : null)
-                            .catch(() => null)
+                            .then(async res => {
+                                if (!res.ok) throw new Error(`第${page}页 HTTP ${res.status}`);
+                                return res.json();
+                            })
+                            .then(data => ({page, data}))
+                            .catch(err => {
+                                console.warn(`⚠️ 第${page}页抓取失败:`, err.message);
+                                return null;
+                            })
                     );
                 }
 
                 const pageResults = await Promise.all(pagePromises);
-                pageResults.forEach(data => {
-                    if (data && data.results) allStocks = allStocks.concat(data.results);
+                let successCount = 1; // 第一页成功
+
+                pageResults.forEach(result => {
+                    if (result && result.data && result.data.results) {
+                        allStocks = allStocks.concat(result.data.results);
+                        successCount++;
+                    }
                 });
 
                 allStocks = allStocks.filter(Boolean);
@@ -190,10 +206,10 @@
                 currentPage = 1;
                 renderTableAndPagination();
 
-                console.log(`✅ 成功抓取 ${allStocks.length} 条数据`);
+                console.log(`✅ 成功抓取 ${allStocks.length} 条股票数据（共成功 ${successCount}/${totalPages} 页）`);
             } catch (e) {
-                console.error('❌ 抓取失败:', e);
-                alert('数据加载失败，请点击“刷新数据”重试');
+                console.error('❌ 数据抓取失败:', e);
+                alert('数据加载较慢，请点击“刷新数据”再试');
             }
         }
 
