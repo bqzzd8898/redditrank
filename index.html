@@ -13,25 +13,21 @@
     </style>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen">
-    <div class="max-w-7xl mx-auto px-6 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <!-- 头部 -->
-        <div class="flex justify-between items-center mb-10">
+        <div class="flex justify-between items-center mb-8 sm:mb-10">
             <div>
-                <h1 class="text-4xl font-bold flex items-center gap-3">
+                <h1 class="text-3xl sm:text-4xl font-bold flex items-center gap-3">
                     🐵 猿智慧
-                    <span class="text-emerald-400 text-2xl">Reddit 实时热度</span>
+                    <span class="text-emerald-400 text-xl sm:text-2xl">Reddit 实时热度</span>
                 </h1>
-                <p class="text-gray-400 mt-1">过去 24 小时 Reddit 提及最多的股票 · 实时更新</p>
+                <p class="text-gray-400 mt-1 text-sm sm:text-base">过去 24 小时 Reddit 提及最多的股票 · 实时更新</p>
             </div>
-            <div class="flex items-center gap-4">
+            <div>
                 <button onclick="refreshData()" 
-                        class="bg-emerald-500 hover:bg-emerald-600 px-6 py-3 rounded-2xl font-medium flex items-center gap-2 transition">
+                        class="bg-emerald-500 hover:bg-emerald-600 px-5 sm:px-6 py-3 rounded-2xl font-medium flex items-center gap-2 transition text-sm sm:text-base">
                     <i class="fas fa-sync"></i> 刷新数据
                 </button>
-                <a href="https://apewisdom.io/" target="_blank"
-                   class="text-gray-400 hover:text-white text-sm flex items-center gap-1">
-                    数据来源 <i class="fas fa-external-link-alt"></i>
-                </a>
             </div>
         </div>
 
@@ -40,29 +36,31 @@
             <input id="searchInput" 
                    type="text" 
                    placeholder="搜索股票代码或名称（如 MU、NVDA）..."
-                   class="w-full bg-gray-900 border border-gray-700 rounded-3xl px-6 py-4 text-lg focus:outline-none focus:border-emerald-500 transition">
+                   class="w-full bg-gray-900 border border-gray-700 rounded-3xl px-6 py-4 text-base sm:text-lg focus:outline-none focus:border-emerald-500 transition">
         </div>
 
-        <!-- 数据表格 -->
+        <!-- 数据表格 - 手机端可左右滑动 -->
         <div class="bg-gray-900 rounded-3xl overflow-hidden border border-gray-800">
-            <table class="w-full">
-                <thead>
-                    <tr class="border-b border-gray-800 text-emerald-400 text-left">
-                        <th class="px-8 py-5 font-medium">排名</th>
-                        <th class="px-8 py-5 font-medium">股票名称</th>
-                        <th class="px-8 py-5 font-medium">代码</th>
-                        <th class="px-8 py-5 font-medium text-right">提及次数</th>
-                        <th class="px-8 py-5 font-medium text-right">24h 变化</th>
-                        <th class="px-8 py-5 font-medium text-right">点赞数</th>
-                        <th class="px-8 py-5 font-medium text-center">操作</th>
-                    </tr>
-                </thead>
-                <tbody id="stockTable" class="text-sm"></tbody>
-            </table>
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[640px]">
+                    <thead>
+                        <tr class="border-b border-gray-800 text-emerald-400 text-left">
+                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium w-12">排名</th>
+                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium">股票名称</th>
+                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium">代码</th>
+                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium text-right">提及次数</th>
+                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium text-right">24h 变化</th>
+                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium text-right">点赞数</th>
+                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium text-center">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stockTable" class="text-sm"></tbody>
+                </table>
+            </div>
         </div>
 
         <div class="text-center text-gray-500 text-xs mt-8">
-            数据来自 apewisdom.io 公开 API · 已使用 CORS 代理 · 每 5 分钟自动刷新
+            每 5 分钟自动刷新一次
         </div>
     </div>
 
@@ -86,16 +84,16 @@
                 const row = document.createElement('tr');
                 row.className = 'border-b border-gray-800 last:border-none hover:bg-gray-800 transition';
                 row.innerHTML = `
-                    <td class="px-8 py-5 font-mono text-lg">${stock.rank}</td>
-                    <td class="px-8 py-5 font-medium">${stock.name}</td>
-                    <td class="px-8 py-5 font-mono text-emerald-400">${stock.ticker}</td>
-                    <td class="px-8 py-5 text-right font-medium">${parseInt(stock.mentions).toLocaleString()}</td>
-                    <td class="px-8 py-5 text-right font-medium ${change.color}">${change.value}</td>
-                    <td class="px-8 py-5 text-right font-medium">${parseInt(stock.upvotes).toLocaleString()}</td>
-                    <td class="px-8 py-5 text-center">
+                    <td class="px-4 sm:px-8 py-4 sm:py-5 font-mono text-base">${stock.rank}</td>
+                    <td class="px-4 sm:px-8 py-4 sm:py-5 font-medium">${stock.name}</td>
+                    <td class="px-4 sm:px-8 py-4 sm:py-5 font-mono text-emerald-400">${stock.ticker}</td>
+                    <td class="px-4 sm:px-8 py-4 sm:py-5 text-right font-medium">${parseInt(stock.mentions).toLocaleString()}</td>
+                    <td class="px-4 sm:px-8 py-4 sm:py-5 text-right font-medium ${change.color}">${change.value}</td>
+                    <td class="px-4 sm:px-8 py-4 sm:py-5 text-right font-medium">${parseInt(stock.upvotes).toLocaleString()}</td>
+                    <td class="px-4 sm:px-8 py-4 sm:py-5 text-center">
                         <a href="https://interactivebrokers.com/mkt/?src=usstok${stock.ticker}&url=%2Fcn%2Fwhyib%2Foverview.php" 
                            target="_blank"
-                           class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-2xl text-sm font-medium transition">
+                           class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 sm:px-6 py-2.5 rounded-2xl text-sm font-medium transition whitespace-nowrap">
                             <i class="fas fa-arrow-right"></i>
                             买入
                         </a>
@@ -111,13 +109,13 @@
             
             try {
                 const res = await fetch(proxyUrl);
-                if (!res.ok) throw new Error('网络请求失败');
+                if (!res.ok) throw new Error('请求失败');
                 const data = await res.json();
                 allStocks = data.results || [];
                 renderTable(allStocks);
             } catch (e) {
                 console.error(e);
-                alert('数据加载失败（代理可能临时不可用），请稍后点击“刷新数据”重试');
+                alert('数据加载失败，请点击“刷新数据”重试');
             }
         }
 
