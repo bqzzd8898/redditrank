@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>猿智慧 | Reddit 实时股票热度榜</title>
+    <title>美股狐狸 | Reddit 实时股票热度榜</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
@@ -18,8 +18,7 @@
         <div class="flex justify-between items-center mb-8 sm:mb-10">
             <div>
                 <h1 class="text-3xl sm:text-4xl font-bold flex items-center gap-3">
-                    🐵 猿智慧
-                    <span class="text-emerald-400 text-xl sm:text-2xl">Reddit 实时热度</span>
+                    🦊 美股狐狸
                 </h1>
                 <p class="text-gray-400 mt-1 text-sm sm:text-base">过去 24 小时 Reddit 提及最多的股票 · 实时更新</p>
             </div>
@@ -59,13 +58,19 @@
             </div>
         </div>
 
-        <div class="text-center text-gray-500 text-xs mt-8">
+        <!-- 分页控件 -->
+        <div id="pagination" class="flex justify-center items-center gap-2 mt-8 flex-wrap"></div>
+
+        <div class="text-center text-gray-500 text-xs mt-6">
             每 5 分钟自动刷新一次
         </div>
     </div>
 
     <script>
         let allStocks = [];
+        let filteredStocks = [];
+        let currentPage = 1;
+        const itemsPerPage = 100;
 
         function calcChange(current, previous) {
             if (!previous || previous === 0 || previous === null) {
@@ -74,6 +79,11 @@
             const change = ((current - previous) / previous) * 100;
             const color = change > 0 ? 'text-emerald-400' : 'text-red-400';
             return { value: (change > 0 ? '+' : '') + change.toFixed(0) + '%', color };
+        }
+
+        function getPaginatedStocks() {
+            const start = (currentPage - 1) * itemsPerPage;
+            return filteredStocks.slice(start, start + itemsPerPage);
         }
 
         function renderTable(stocks) {
@@ -103,33 +113,113 @@
             });
         }
 
-        async function fetchData() {
-            const apiUrl = 'https://apewisdom.io/api/v1.0/filter/all-stocks';
-            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
-            
-            try {
-                const res = await fetch(proxyUrl);
-                if (!res.ok) throw new Error('请求失败');
-                const data = await res.json();
-                allStocks = data.results || [];
-                renderTable(allStocks);
-            } catch (e) {
-                console.error(e);
-                alert('数据加载失败，请点击“刷新数据”重试');
+        function renderPagination() {
+            const pagination = document.getElementById('pagination');
+            const totalPages = Math.ceil(filteredStocks.length / itemsPerPage);
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
             }
+
+            let html = `<div class="flex items-center gap-1 text-sm bg-gray-900 rounded-3xl px-6 py-3 border border-gray-800">`;
+
+            // 上一页
+            html += `
+                <button onclick="goToPage(${currentPage - 1})" 
+                        class="px-5 py-2 rounded-2xl border border-gray-700 hover:bg-gray-800 transition ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
+                        ${currentPage === 1 ? 'disabled' : ''}>
+                    上一页
+                </button>`;
+
+            // 页码
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentPage) {
+                    html += `<button onclick="goToPage(${i})" class="px-5 py-2 rounded-2xl bg-emerald-500 text-white font-medium">${i}</button>`;
+                } else {
+                    html += `<button onclick="goToPage(${i})" class="px-5 py-2 rounded-2xl border border-gray-700 hover:bg-gray-800 transition">${i}</button>`;
+                }
+            }
+
+            // 下一页
+            html += `
+                <button onclick="goToPage(${currentPage + 1})" 
+                        class="px-5 py-2 rounded-2xl border border-gray-700 hover:bg-gray-800 transition ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}"
+                        ${currentPage === totalPages ? 'disabled' : ''}>
+                    下一页
+                </button>`;
+
+            html += `</div>`;
+
+            // 当前页信息
+            html += `
+                <div class="ml-6 text-gray-400 text-xs flex items-center gap-1">
+                    第 <span class="text-emerald-400 font-medium">${currentPage}</span> / ${totalPages} 页
+                    <span class="text-gray-500">· 共 ${filteredStocks.length} 只股票</span>
+                </div>`;
+
+            pagination.innerHTML = html;
+        }
+
+        function renderTableAndPagination() {
+            renderTable(getPaginatedStocks());
+            renderPagination();
+        }
+
+        function goToPage(page) {
+            const totalPages = Math.ceil(filteredStocks.length / itemsPerPage);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderTableAndPagination();
+        }
+
+        async function fetchData() {
+            let stocks = [];
+            let page = 1;
+            let totalPages = 20;
+
+            while (page <= totalPages) {
+                const apiUrl = page === 1 
+                    ? 'https://apewisdom.io/api/v1.0/filter/all-stocks' 
+                    : `https://apewisdom.io/api/v1.0/filter/all-stocks/page/${page}`;
+                
+                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
+                
+                try {
+                    const res = await fetch(proxyUrl);
+                    if (!res.ok) break;
+                    const data = await res.json();
+                    
+                    if (data.results && data.results.length > 0) {
+                        stocks = stocks.concat(data.results);
+                    } else {
+                        break;
+                    }
+                    if (data.pages) totalPages = data.pages;
+                    page++;
+                } catch (e) {
+                    console.error(e);
+                    break;
+                }
+            }
+
+            allStocks = stocks;
+            filteredStocks = [...stocks];
+            currentPage = 1;
+            renderTableAndPagination();
         }
 
         function filterStocks() {
             const keyword = document.getElementById('searchInput').value.toUpperCase().trim();
             if (!keyword) {
-                renderTable(allStocks);
-                return;
+                filteredStocks = [...allStocks];
+            } else {
+                filteredStocks = allStocks.filter(stock => 
+                    stock.ticker.includes(keyword) || 
+                    stock.name.toUpperCase().includes(keyword)
+                );
             }
-            const filtered = allStocks.filter(stock => 
-                stock.ticker.includes(keyword) || 
-                stock.name.toUpperCase().includes(keyword)
-            );
-            renderTable(filtered);
+            currentPage = 1;
+            renderTableAndPagination();
         }
 
         function refreshData() {
