@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reddit 美股热议排行</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { font-family: 'Microsoft YaHei', system-ui, sans-serif; }
+        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); }
+        .ticker { transition: all 0.3s; }
+        .ticker:hover { transform: scale(1.05); color: #4ade80; }
+        table tr { transition: all 0.2s; }
+        table tr:hover { background: rgba(74, 222, 128, 0.1) !important; transform: translateX(4px); }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-200 min-h-screen">
+    <div class="max-w-7xl mx-auto p-6">
+        <!-- 头部 -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-10">
+            <div>
+                <h1 class="text-5xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+                    Reddit 热议排行
+                </h1>
+                <p class="text-zinc-400 mt-2 text-lg">实时追踪全球社区最热门美股</p>
+            </div>
+            <div class="flex items-center gap-4 mt-4 md:mt-0">
+                <button onclick="loadData()" 
+                        class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-3 rounded-2xl transition">
+                    <i class="fas fa-sync"></i> 刷新数据
+                </button>
+            </div>
+        </div>
+
+        <!-- 筛选 + 搜索 -->
+        <div class="flex flex-col md:flex-row gap-4 mb-8">
+            <select id="filter" onchange="loadData()" 
+                    class="bg-zinc-900 border border-zinc-700 rounded-2xl px-5 py-4 text-lg focus:outline-none focus:border-emerald-500">
+                <option value="all-stocks">🌍 全市场</option>
+                <option value="wallstreetbets">🔥 WallStreetBets</option>
+                <option value="stocks">📈 r/stocks</option>
+                <option value="all">🌐 全部 (含Crypto)</option>
+            </select>
+
+            <div class="flex-1 relative">
+                <input type="text" id="searchInput" placeholder="搜索股票代码或名称..." 
+                       onkeyup="filterTable()"
+                       class="w-full bg-zinc-900 border border-zinc-700 rounded-2xl px-6 py-4 text-lg focus:outline-none focus:border-blue-500">
+                <i class="fas fa-search absolute right-6 top-1/2 -translate-y-1/2 text-zinc-500"></i>
+            </div>
+        </div>
+
+        <!-- 表格 -->
+        <div class="glass rounded-3xl overflow-hidden border border-zinc-800 shadow-2xl">
+            <table class="w-full" id="dataTable">
+                <thead>
+                    <tr class="bg-zinc-900 border-b border-zinc-700">
+                        <th class="py-6 px-6 text-left">排名</th>
+                        <th class="py-6 px-6 text-left">股票代码</th>
+                        <th class="py-6 px-6 text-left">公司名称</th>
+                        <th class="py-6 px-6 text-right">提及次数</th>
+                        <th class="py-6 px-6 text-center">24h 变化</th>
+                        <th class="py-6 px-6 text-center">快速查看</th>
+                    </tr>
+                </thead>
+                <tbody class="text-zinc-300"></tbody>
+            </table>
+        </div>
+
+        <div class="text-center text-zinc-500 text-sm mt-8">
+            数据实时更新 • 完全本地运行 • 单文件版本
+        </div>
+    </div>
+
+    <script>
+        async function loadData() {
+            const filter = document.getElementById('filter').value;
+            const tbody = document.querySelector('#dataTable tbody');
+            tbody.innerHTML = `
+                <tr><td colspan="6" class="text-center py-20">
+                    <i class="fas fa-spinner fa-spin text-4xl text-emerald-500"></i>
+                    <p class="mt-4">正在加载最新数据...</p>
+                </td></tr>
+            `;
+
+            try {
+                const res = await fetch(`https://apewisdom.io/api/v1.0/filter/${filter}/page/1`);
+                const json = await res.json();
+                tbody.innerHTML = '';
+
+                json.results.forEach(item => {
+                    const change = item.rank_24h_ago 
+                        ? (item.rank_24h_ago > item.rank ? 'text-emerald-400' : 'text-red-400') 
+                        : 'text-zinc-500';
+                    
+                    const row = document.createElement('tr');
+                    row.className = "border-b border-zinc-800 hover:bg-zinc-900/50";
+                    row.innerHTML = `
+                        <td class="py-5 px-6 font-mono text-xl font-bold">#${item.rank}</td>
+                        <td class="py-5 px-6">
+                            <span class="ticker text-emerald-400 text-2xl font-bold">$${item.ticker}</span>
+                        </td>
+                        <td class="py-5 px-6 text-zinc-400">${item.name || '暂无中文名称'}</td>
+                        <td class="py-5 px-6 text-right font-mono text-2xl font-bold">${item.mentions.toLocaleString()}</td>
+                        <td class="py-5 px-6 text-center">
+                            <span class="${change} font-medium">
+                                ${item.rank_24h_ago ? `#${item.rank_24h_ago}` : '新上榜'}
+                            </span>
+                        </td>
+                        <td class="py-5 px-6 text-center">
+                            <a href="https://finance.yahoo.com/quote/${item.ticker}" target="_blank"
+                               class="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 mx-2">
+                                <i class="fas fa-chart-line"></i> Yahoo
+                            </a>
+                            <a href="https://www.tradingview.com/symbols/${item.ticker}" target="_blank"
+                               class="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 mx-2">
+                                <i class="fas fa-chart-bar"></i> TV
+                            </a>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-20 text-red-400">加载失败，请稍后刷新</td></tr>`;
+            }
+        }
+
+        function filterTable() {
+            const input = document.getElementById('searchInput').value.toUpperCase();
+            const rows = document.querySelectorAll('#dataTable tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toUpperCase();
+                row.style.display = text.includes(input) ? '' : 'none';
+            });
+        }
+
+        // 页面加载完自动刷新
+        window.onload = loadData;
+    </script>
+</body>
+</html>
