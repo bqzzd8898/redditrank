@@ -11,7 +11,7 @@
         table { border-collapse: collapse; }
         tr:hover { background-color: #1f2937; }
         
-        /* 狐狸 SVG 固定大小 + 所有设备完全一致 */
+        /* 狐狸 SVG 固定大小 */
         .fox-icon {
             width: 44px;
             height: 44px;
@@ -24,6 +24,14 @@
                 height: 52px;
             }
         }
+
+        /* 手机端分页优化 */
+        #pagination {
+            scrollbar-width: none; /* 隐藏滚动条 */
+        }
+        #pagination::-webkit-scrollbar {
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen">
@@ -31,7 +39,6 @@
         <!-- 头部 -->
         <div class="flex justify-between items-center mb-8 sm:mb-10">
             <div class="flex items-center gap-3">
-                <!-- 使用 Twemoji SVG，保证所有浏览器完全一样 -->
                 <img src="https://twemoji.maxcdn.com/v/latest/svg/1f98a.svg" 
                      alt="狐狸" 
                      class="fox-icon">
@@ -73,10 +80,10 @@
             </div>
         </div>
 
-        <!-- 分页控件 -->
-        <div id="pagination" class="flex justify-center items-center gap-2 mt-8 flex-wrap"></div>
+        <!-- 分页控件 - 手机端优化 -->
+        <div id="pagination" class="flex justify-center items-center gap-1 sm:gap-2 mt-8 flex-wrap overflow-x-auto pb-4"></div>
 
-        <div class="text-center text-gray-500 text-xs mt-6">
+        <div class="text-center text-gray-500 text-xs mt-4">
             每 5 分钟自动刷新一次
         </div>
     </div>
@@ -136,36 +143,40 @@
                 return;
             }
 
-            let html = `<div class="flex items-center gap-1 text-sm bg-gray-900 rounded-3xl px-6 py-3 border border-gray-800">`;
+            let html = `<div class="flex items-center gap-1 text-sm bg-gray-900 rounded-3xl px-4 sm:px-6 py-3 border border-gray-800 min-w-max">`;
 
+            // 上一页
             html += `
                 <button onclick="goToPage(${currentPage - 1})" 
-                        class="px-5 py-2 rounded-2xl border border-gray-700 hover:bg-gray-800 transition ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
+                        class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-xs sm:text-sm ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
                         ${currentPage === 1 ? 'disabled' : ''}>
                     上一页
                 </button>`;
 
+            // 页码按钮（手机端也清晰）
             for (let i = 1; i <= totalPages; i++) {
                 if (i === currentPage) {
-                    html += `<button onclick="goToPage(${i})" class="px-5 py-2 rounded-2xl bg-emerald-500 text-white font-medium">${i}</button>`;
+                    html += `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium text-xs sm:text-sm">${i}</button>`;
                 } else {
-                    html += `<button onclick="goToPage(${i})" class="px-5 py-2 rounded-2xl border border-gray-700 hover:bg-gray-800 transition">${i}</button>`;
+                    html += `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-xs sm:text-sm">${i}</button>`;
                 }
             }
 
+            // 下一页
             html += `
                 <button onclick="goToPage(${currentPage + 1})" 
-                        class="px-5 py-2 rounded-2xl border border-gray-700 hover:bg-gray-800 transition ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}"
+                        class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-xs sm:text-sm ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}"
                         ${currentPage === totalPages ? 'disabled' : ''}>
                     下一页
                 </button>`;
 
             html += `</div>`;
 
+            // 当前页信息
             html += `
-                <div class="ml-6 text-gray-400 text-xs flex items-center gap-1">
+                <div class="ml-4 text-gray-400 text-xs flex items-center gap-1 whitespace-nowrap">
                     第 <span class="text-emerald-400 font-medium">${currentPage}</span> / ${totalPages} 页
-                    <span class="text-gray-500">· 共 ${filteredStocks.length} 只股票</span>
+                    <span class="text-gray-500">· 共 ${filteredStocks.length} 只</span>
                 </div>`;
 
             pagination.innerHTML = html;
