@@ -18,25 +18,34 @@
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <!-- 头部 -->
         <div class="flex justify-between items-center mb-8 sm:mb-10">
             <div>
                 <h1 class="text-3xl sm:text-4xl font-bold flex items-center gap-3">
-                    <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f98a.svg" alt="🦊" class="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
+                    <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f98a.svg" 
+                         alt="🦊" 
+                         class="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
                     美股狐狸
                 </h1>
                 <p class="text-gray-400 mt-1 text-sm sm:text-base">过去 24 小时 Reddit 提及最多的股票 · 实时更新</p>
             </div>
             <div>
-                <button onclick="refreshData()" class="bg-emerald-500 hover:bg-emerald-600 px-5 sm:px-6 py-3 rounded-2xl font-medium flex items-center gap-2 transition text-sm sm:text-base">
+                <button onclick="refreshData()" 
+                        class="bg-emerald-500 hover:bg-emerald-600 px-5 sm:px-6 py-3 rounded-2xl font-medium flex items-center gap-2 transition text-sm sm:text-base">
                     <i class="fas fa-sync"></i> 刷新数据
                 </button>
             </div>
         </div>
 
+        <!-- 搜索框 -->
         <div class="mb-6">
-            <input id="searchInput" type="text" placeholder="搜索股票代码或名称（如 MU、NVDA）..." class="w-full bg-gray-900 border border-gray-700 rounded-3xl px-6 py-4 text-base sm:text-lg focus:outline-none focus:border-emerald-500 transition">
+            <input id="searchInput" 
+                   type="text" 
+                   placeholder="搜索股票代码或名称（如 MU、NVDA）..."
+                   class="w-full bg-gray-900 border border-gray-700 rounded-3xl px-6 py-4 text-base sm:text-lg focus:outline-none focus:border-emerald-500 transition">
         </div>
 
+        <!-- 数据表格 -->
         <div class="bg-gray-900 rounded-3xl overflow-hidden border border-gray-800">
             <div class="overflow-x-auto">
                 <table class="w-full min-w-[680px]">
@@ -56,10 +65,11 @@
             </div>
         </div>
 
+        <!-- 分页控件 -->
         <div id="pagination" class="flex justify-center items-center gap-2 mt-8 flex-wrap"></div>
 
         <div class="text-center text-gray-500 text-xs mt-6">
-            每 5 分钟自动刷新一次 · 方案1（已优化分页）
+            每 5 分钟自动刷新一次 · 已使用 corsproxy.io 并行抓取（方案1）
         </div>
     </div>
 
@@ -67,10 +77,12 @@
         let allStocks = [];
         let filteredStocks = [];
         let currentPage = 1;
-        const itemsPerPage = 50;   // ←←← 改成50条/页，现在分页会更多
+        const itemsPerPage = 100;
 
         function calcChange(current, previous) {
-            if (!previous || previous === 0 || previous === null) return { value: '新上榜', color: 'text-yellow-400' };
+            if (!previous || previous === 0 || previous === null) {
+                return { value: '新上榜', color: 'text-yellow-400' };
+            }
             const change = ((current - previous) / previous) * 100;
             const color = change > 0 ? 'text-emerald-400' : 'text-red-400';
             return { value: (change > 0 ? '+' : '') + change.toFixed(0) + '%', color };
@@ -96,8 +108,11 @@
                     <td class="px-4 sm:px-8 py-4 sm:py-5 text-right font-medium ${change.color}">${change.value}</td>
                     <td class="px-4 sm:px-8 py-4 sm:py-5 text-right font-medium">${parseInt(stock.upvotes).toLocaleString()}</td>
                     <td class="px-4 sm:px-8 py-4 sm:py-5 text-center">
-                        <a href="https://interactivebrokers.com/mkt/?src=usstok${stock.ticker}&url=%2Fcn%2Fwhyib%2Foverview.php" target="_blank" class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 sm:px-6 py-2.5 rounded-2xl text-sm font-medium transition whitespace-nowrap">
-                            <i class="fas fa-arrow-right"></i> 买入
+                        <a href="https://interactivebrokers.com/mkt/?src=usstok${stock.ticker}&url=%2Fcn%2Fwhyib%2Foverview.php" 
+                           target="_blank"
+                           class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 sm:px-6 py-2.5 rounded-2xl text-sm font-medium transition whitespace-nowrap">
+                            <i class="fas fa-arrow-right"></i>
+                            买入
                         </a>
                     </td>
                 `;
@@ -108,29 +123,41 @@
         function renderPagination() {
             const pagination = document.getElementById('pagination');
             const totalPages = Math.ceil(filteredStocks.length / itemsPerPage);
-            if (totalPages <= 1) { pagination.innerHTML = ''; return; }
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
 
-            let pagesHtml = `<button onclick="goToPage(${currentPage - 1})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-sm font-medium ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>`;
+            let pagesHtml = '';
+
+            pagesHtml += `<button onclick="goToPage(${currentPage - 1})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-sm font-medium ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>`;
 
             if (totalPages <= 8) {
                 for (let i = 1; i <= totalPages; i++) {
-                    pagesHtml += i === currentPage 
-                        ? `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium min-w-[40px]">${i}</button>` 
-                        : `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">${i}</button>`;
+                    if (i === currentPage) {
+                        pagesHtml += `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium min-w-[40px]">${i}</button>`;
+                    } else {
+                        pagesHtml += `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">${i}</button>`;
+                    }
                 }
             } else {
-                // 省略版分页逻辑（保持不变）
                 if (currentPage === 1) pagesHtml += `<button class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium min-w-[40px]">1</button>`;
                 else pagesHtml += `<button onclick="goToPage(1)" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">1</button>`;
+
                 if (currentPage > 4) pagesHtml += `<span class="px-2 text-gray-500 font-medium">...</span>`;
+
                 const startPage = Math.max(2, currentPage - 2);
                 const endPage = Math.min(totalPages - 1, currentPage + 2);
                 for (let i = startPage; i <= endPage; i++) {
-                    pagesHtml += i === currentPage 
-                        ? `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium min-w-[40px]">${i}</button>` 
-                        : `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">${i}</button>`;
+                    if (i === currentPage) {
+                        pagesHtml += `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium min-w-[40px]">${i}</button>`;
+                    } else {
+                        pagesHtml += `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">${i}</button>`;
+                    }
                 }
+
                 if (currentPage < totalPages - 3) pagesHtml += `<span class="px-2 text-gray-500 font-medium">...</span>`;
+
                 if (currentPage === totalPages) pagesHtml += `<button class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium min-w-[40px]">${totalPages}</button>`;
                 else pagesHtml += `<button onclick="goToPage(${totalPages})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">${totalPages}</button>`;
             }
@@ -138,9 +165,12 @@
             pagesHtml += `<button onclick="goToPage(${currentPage + 1})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-sm font-medium ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>`;
 
             pagination.innerHTML = `
-                <div class="flex items-center gap-1 bg-gray-900 rounded-3xl px-4 sm:px-6 py-3 border border-gray-800 flex-wrap justify-center">${pagesHtml}</div>
+                <div class="flex items-center gap-1 bg-gray-900 rounded-3xl px-4 sm:px-6 py-3 border border-gray-800 flex-wrap justify-center">
+                    ${pagesHtml}
+                </div>
                 <div class="mt-4 sm:mt-0 sm:ml-6 text-gray-400 text-xs flex items-center justify-center sm:justify-start gap-1">
-                    第 <span class="text-emerald-400 font-medium">${currentPage}</span> / ${totalPages} 页 · 共 ${filteredStocks.length} 只股票
+                    第 <span class="text-emerald-400 font-medium">${currentPage}</span> / ${totalPages} 页
+                    <span class="text-gray-500 hidden sm:inline">· 共 ${filteredStocks.length} 只股票</span>
                 </div>`;
         }
 
@@ -156,68 +186,68 @@
             renderTableAndPagination();
         }
 
+        // ==================== 方案1 核心代码（已替换）====================
         async function fetchData() {
             try {
                 const baseApi = 'https://apewisdom.io/api/v1.0/filter/all-stocks';
+                
+                // ✅ 使用 corsproxy.io（目前最快的免费代理）
                 const getProxyUrl = (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`;
 
                 console.log('🚀 开始抓取数据...');
 
+                // 第一页（同时拿到总页数）
                 const firstRes = await fetch(getProxyUrl(baseApi));
-                if (!firstRes.ok) throw new Error('第一页失败');
+                if (!firstRes.ok) throw new Error('第一页请求失败');
+                
                 const firstData = await firstRes.json();
-
                 let allStocks = firstData.results || [];
-                const totalPages = firstData.pages || 15;   // 直接用API返回的页数
+                const totalPages = Math.min(firstData.pages || 15, 15); // 最多抓15页，够用了
 
-                console.log(`📄 API 共有 ${totalPages} 页，准备并行抓取...`);
-
+                // 并行抓取剩余页面（这就是速度飞起的关键！）
                 const pagePromises = [];
                 for (let page = 2; page <= totalPages; page++) {
                     const pageUrl = `https://apewisdom.io/api/v1.0/filter/all-stocks/page/${page}`;
                     pagePromises.push(
                         fetch(getProxyUrl(pageUrl))
-                            .then(async res => {
-                                if (!res.ok) throw new Error(`第${page}页 HTTP ${res.status}`);
-                                return res.json();
-                            })
-                            .then(data => ({page, data}))
-                            .catch(err => {
-                                console.warn(`⚠️ 第${page}页抓取失败:`, err.message);
-                                return null;
-                            })
+                            .then(res => res.ok ? res.json() : null)
+                            .catch(() => null)
                     );
                 }
 
                 const pageResults = await Promise.all(pagePromises);
-                let successCount = 1; // 第一页成功
-
-                pageResults.forEach(result => {
-                    if (result && result.data && result.data.results) {
-                        allStocks = allStocks.concat(result.data.results);
-                        successCount++;
+                
+                pageResults.forEach(data => {
+                    if (data && data.results && data.results.length > 0) {
+                        allStocks = allStocks.concat(data.results);
                     }
                 });
 
-                allStocks = allStocks.filter(Boolean);
+                allStocks = allStocks.filter(Boolean); // 清理空数据
 
+                // 更新全局数据
                 allStocks = allStocks;
                 filteredStocks = [...allStocks];
                 currentPage = 1;
                 renderTableAndPagination();
 
-                console.log(`✅ 成功抓取 ${allStocks.length} 条股票数据（共成功 ${successCount}/${totalPages} 页）`);
+                console.log(`✅ 成功抓取 ${allStocks.length} 条股票数据，加载完成！`);
             } catch (e) {
                 console.error('❌ 数据抓取失败:', e);
-                alert('数据加载较慢，请点击“刷新数据”再试');
+                alert('数据加载有点慢，请点击“刷新数据”按钮再试一次');
             }
         }
 
         function filterStocks() {
             const keyword = document.getElementById('searchInput').value.toUpperCase().trim();
-            filteredStocks = !keyword ? [...allStocks] : allStocks.filter(stock => 
-                stock.ticker.includes(keyword) || stock.name.toUpperCase().includes(keyword)
-            );
+            if (!keyword) {
+                filteredStocks = [...allStocks];
+            } else {
+                filteredStocks = allStocks.filter(stock => 
+                    stock.ticker.includes(keyword) || 
+                    stock.name.toUpperCase().includes(keyword)
+                );
+            }
             currentPage = 1;
             renderTableAndPagination();
         }
@@ -228,8 +258,10 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             fetchData();
-            document.getElementById('searchInput').addEventListener('input', filterStocks);
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', filterStocks);
             setInterval(fetchData, 300000);
+            tailwind.config = { content: ["./**/*.{html,js}"] };
         });
     </script>
 </body>
