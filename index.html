@@ -62,26 +62,25 @@
         </div>
 
         <div class="text-center text-gray-500 text-xs mt-8">
-            数据来自 apewisdom.io 公开 API · 每 5 分钟自动刷新一次
+            数据来自 apewisdom.io 公开 API · 已使用 CORS 代理 · 每 5 分钟自动刷新
         </div>
     </div>
 
     <script>
         let allStocks = [];
 
-        // 计算 24h 变化百分比
         function calcChange(current, previous) {
-            if (!previous || previous === 0) return { value: '新上榜', color: 'text-yellow-400' };
+            if (!previous || previous === 0 || previous === null) {
+                return { value: '新上榜', color: 'text-yellow-400' };
+            }
             const change = ((current - previous) / previous) * 100;
             const color = change > 0 ? 'text-emerald-400' : 'text-red-400';
-            return { value: change.toFixed(0) + '%', color };
+            return { value: (change > 0 ? '+' : '') + change.toFixed(0) + '%', color };
         }
 
-        // 渲染表格
         function renderTable(stocks) {
             const tbody = document.getElementById('stockTable');
             tbody.innerHTML = '';
-            
             stocks.forEach(stock => {
                 const change = calcChange(stock.mentions, stock.mentions_24h_ago);
                 const row = document.createElement('tr');
@@ -106,20 +105,22 @@
             });
         }
 
-        // 获取数据
         async function fetchData() {
+            const apiUrl = 'https://apewisdom.io/api/v1.0/filter/all-stocks';
+            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
+            
             try {
-                const res = await fetch('https://apewisdom.io/api/v1.0/filter/all-stocks');
+                const res = await fetch(proxyUrl);
+                if (!res.ok) throw new Error('网络请求失败');
                 const data = await res.json();
-                allStocks = data.results;
+                allStocks = data.results || [];
                 renderTable(allStocks);
             } catch (e) {
                 console.error(e);
-                alert('数据加载失败，请稍后刷新页面');
+                alert('数据加载失败（代理可能临时不可用），请稍后点击“刷新数据”重试');
             }
         }
 
-        // 搜索功能
         function filterStocks() {
             const keyword = document.getElementById('searchInput').value.toUpperCase().trim();
             if (!keyword) {
@@ -133,23 +134,15 @@
             renderTable(filtered);
         }
 
-        // 刷新按钮
         function refreshData() {
             fetchData();
         }
 
-        // 初始化
         document.addEventListener('DOMContentLoaded', () => {
             fetchData();
-            
-            // 搜索事件
             const searchInput = document.getElementById('searchInput');
             searchInput.addEventListener('input', filterStocks);
-            
-            // 每5分钟自动刷新
-            setInterval(fetchData, 300000);
-            
-            // Tailwind 初始化
+            setInterval(fetchData, 300000); // 每5分钟自动刷新
             tailwind.config = { content: ["./**/*.{html,js}"] };
         });
     </script>
