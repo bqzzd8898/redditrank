@@ -10,20 +10,42 @@
         body { font-family: system-ui, -apple-system, sans-serif; }
         table { border-collapse: collapse; }
         tr:hover { background-color: #1f2937; }
+        
+        /* 狐狸头像固定大小（你最喜欢的样式） */
+        .fox-icon {
+            width: 44px;
+            height: 44px;
+            font-size: 44px;
+            line-height: 1;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        @media (min-width: 640px) {
+            .fox-icon {
+                width: 52px;
+                height: 52px;
+                font-size: 52px;
+            }
+        }
+
+        /* 手机端分页优化 */
+        #pagination {
+            scrollbar-width: none;
+        }
+        #pagination::-webkit-scrollbar {
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        <!-- 头部 -->
-        <div class="flex justify-between items-center mb-8 sm:mb-10">
-            <div>
-                <h1 class="text-3xl sm:text-4xl font-bold flex items-center gap-3">
-                    <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f98a.svg" 
-                         alt="🦊" 
-                         class="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
-                    美股狐狸
-                </h1>
-                <p class="text-gray-400 mt-1 text-sm sm:text-base">过去 24 小时 Reddit 提及最多的股票 · 实时更新</p>
+        <!-- 头部：你最喜欢的对齐方式 -->
+        <div class="flex justify-between items-center mb-6">
+            <div class="flex items-center gap-3">
+                <span class="fox-icon">🦊</span>
+                <h1 class="text-3xl sm:text-4xl font-bold">美股狐狸</h1>
             </div>
             <div>
                 <button onclick="refreshData()" 
@@ -32,6 +54,11 @@
                 </button>
             </div>
         </div>
+
+        <!-- 小字描述 -->
+        <p class="text-gray-400 text-sm sm:text-base pl-14 sm:pl-[68px] -mt-1 mb-8">
+            过去 24 小时 Reddit 提及最多的股票 · 实时更新
+        </p>
 
         <!-- 搜索框 -->
         <div class="mb-6">
@@ -62,9 +89,9 @@
         </div>
 
         <!-- 分页控件 -->
-        <div id="pagination" class="flex justify-center items-center gap-2 mt-8 flex-wrap"></div>
+        <div id="pagination" class="flex justify-center items-center gap-1 sm:gap-2 mt-8 flex-wrap overflow-x-auto pb-4"></div>
 
-        <div class="text-center text-gray-500 text-xs mt-6">
+        <div class="text-center text-gray-500 text-xs mt-4">
             每 5 分钟自动刷新一次
         </div>
     </div>
@@ -124,12 +151,12 @@
                 return;
             }
 
-            let html = `<div class="flex items-center gap-1 text-sm bg-gray-900 rounded-3xl px-6 py-3 border border-gray-800">`;
+            let html = `<div class="flex items-center gap-1 text-sm bg-gray-900 rounded-3xl px-4 sm:px-6 py-3 border border-gray-800 min-w-max">`;
 
             // 上一页
             html += `
                 <button onclick="goToPage(${currentPage - 1})" 
-                        class="px-5 py-2 rounded-2xl border border-gray-700 hover:bg-gray-800 transition ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
+                        class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-xs sm:text-sm ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
                         ${currentPage === 1 ? 'disabled' : ''}>
                     上一页
                 </button>`;
@@ -137,16 +164,16 @@
             // 页码
             for (let i = 1; i <= totalPages; i++) {
                 if (i === currentPage) {
-                    html += `<button onclick="goToPage(${i})" class="px-5 py-2 rounded-2xl bg-emerald-500 text-white font-medium">${i}</button>`;
+                    html += `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium text-xs sm:text-sm">${i}</button>`;
                 } else {
-                    html += `<button onclick="goToPage(${i})" class="px-5 py-2 rounded-2xl border border-gray-700 hover:bg-gray-800 transition">${i}</button>`;
+                    html += `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-xs sm:text-sm">${i}</button>`;
                 }
             }
 
             // 下一页
             html += `
                 <button onclick="goToPage(${currentPage + 1})" 
-                        class="px-5 py-2 rounded-2xl border border-gray-700 hover:bg-gray-800 transition ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}"
+                        class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-xs sm:text-sm ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}"
                         ${currentPage === totalPages ? 'disabled' : ''}>
                     下一页
                 </button>`;
@@ -155,12 +182,17 @@
 
             // 当前页信息
             html += `
-                <div class="ml-6 text-gray-400 text-xs flex items-center gap-1">
+                <div class="ml-4 text-gray-400 text-xs flex items-center gap-1 whitespace-nowrap">
                     第 <span class="text-emerald-400 font-medium">${currentPage}</span> / ${totalPages} 页
-                    <span class="text-gray-500">· 共 ${filteredStocks.length} 只股票</span>
+                    <span class="text-gray-500">· 共 ${filteredStocks.length} 只</span>
                 </div>`;
 
             pagination.innerHTML = html;
+
+            // 关键修复：每次渲染后自动滚动到最左侧，让第1页始终可见
+            setTimeout(() => {
+                pagination.scrollLeft = 0;
+            }, 0);
         }
 
         function renderTableAndPagination() {
