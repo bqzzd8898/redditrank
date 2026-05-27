@@ -3,141 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reddit 美股热议排行</title>
+    <title>猿智慧 | Reddit 实时股票热度榜</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
-        body { font-family: 'Microsoft YaHei', system-ui, sans-serif; }
-        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); }
-        .ticker { transition: all 0.3s; }
-        .ticker:hover { transform: scale(1.05); color: #4ade80; }
-        table tr { transition: all 0.2s; }
-        table tr:hover { background: rgba(74, 222, 128, 0.1) !important; transform: translateX(4px); }
+        body { font-family: system-ui, -apple-system, sans-serif; }
+        table { border-collapse: collapse; }
+        tr:hover { background-color: #1f2937; }
     </style>
 </head>
-<body class="bg-zinc-950 text-zinc-200 min-h-screen">
-    <div class="max-w-7xl mx-auto p-6">
+<body class="bg-gray-950 text-gray-100 min-h-screen">
+    <div class="max-w-7xl mx-auto px-6 py-8">
         <!-- 头部 -->
-        <div class="flex flex-col md:flex-row justify-between items-center mb-10">
+        <div class="flex justify-between items-center mb-10">
             <div>
-                <h1 class="text-5xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
-                    Reddit 热议排行
+                <h1 class="text-4xl font-bold flex items-center gap-3">
+                    🐵 猿智慧
+                    <span class="text-emerald-400 text-2xl">Reddit 实时热度</span>
                 </h1>
-                <p class="text-zinc-400 mt-2 text-lg">实时追踪全球社区最热门美股</p>
+                <p class="text-gray-400 mt-1">过去 24 小时 Reddit 提及最多的股票 · 实时更新</p>
             </div>
-            <div class="flex items-center gap-4 mt-4 md:mt-0">
-                <button onclick="loadData()" 
-                        class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-3 rounded-2xl transition">
+            <div class="flex items-center gap-4">
+                <button onclick="refreshData()" 
+                        class="bg-emerald-500 hover:bg-emerald-600 px-6 py-3 rounded-2xl font-medium flex items-center gap-2 transition">
                     <i class="fas fa-sync"></i> 刷新数据
                 </button>
+                <a href="https://apewisdom.io/" target="_blank"
+                   class="text-gray-400 hover:text-white text-sm flex items-center gap-1">
+                    数据来源 <i class="fas fa-external-link-alt"></i>
+                </a>
             </div>
         </div>
 
-        <!-- 筛选 + 搜索 -->
-        <div class="flex flex-col md:flex-row gap-4 mb-8">
-            <select id="filter" onchange="loadData()" 
-                    class="bg-zinc-900 border border-zinc-700 rounded-2xl px-5 py-4 text-lg focus:outline-none focus:border-emerald-500">
-                <option value="all-stocks">🌍 全市场</option>
-                <option value="wallstreetbets">🔥 WallStreetBets</option>
-                <option value="stocks">📈 r/stocks</option>
-                <option value="all">🌐 全部 (含Crypto)</option>
-            </select>
-
-            <div class="flex-1 relative">
-                <input type="text" id="searchInput" placeholder="搜索股票代码或名称..." 
-                       onkeyup="filterTable()"
-                       class="w-full bg-zinc-900 border border-zinc-700 rounded-2xl px-6 py-4 text-lg focus:outline-none focus:border-blue-500">
-                <i class="fas fa-search absolute right-6 top-1/2 -translate-y-1/2 text-zinc-500"></i>
-            </div>
+        <!-- 搜索框 -->
+        <div class="mb-6">
+            <input id="searchInput" 
+                   type="text" 
+                   placeholder="搜索股票代码或名称（如 MU、NVDA）..."
+                   class="w-full bg-gray-900 border border-gray-700 rounded-3xl px-6 py-4 text-lg focus:outline-none focus:border-emerald-500 transition">
         </div>
 
-        <!-- 表格 -->
-        <div class="glass rounded-3xl overflow-hidden border border-zinc-800 shadow-2xl">
-            <table class="w-full" id="dataTable">
+        <!-- 数据表格 -->
+        <div class="bg-gray-900 rounded-3xl overflow-hidden border border-gray-800">
+            <table class="w-full">
                 <thead>
-                    <tr class="bg-zinc-900 border-b border-zinc-700">
-                        <th class="py-6 px-6 text-left">排名</th>
-                        <th class="py-6 px-6 text-left">股票代码</th>
-                        <th class="py-6 px-6 text-left">公司名称</th>
-                        <th class="py-6 px-6 text-right">提及次数</th>
-                        <th class="py-6 px-6 text-center">24h 变化</th>
-                        <th class="py-6 px-6 text-center">快速查看</th>
+                    <tr class="border-b border-gray-800 text-emerald-400 text-left">
+                        <th class="px-8 py-5 font-medium">排名</th>
+                        <th class="px-8 py-5 font-medium">股票名称</th>
+                        <th class="px-8 py-5 font-medium">代码</th>
+                        <th class="px-8 py-5 font-medium text-right">提及次数</th>
+                        <th class="px-8 py-5 font-medium text-right">24h 变化</th>
+                        <th class="px-8 py-5 font-medium text-right">点赞数</th>
+                        <th class="px-8 py-5 font-medium text-center">操作</th>
                     </tr>
                 </thead>
-                <tbody class="text-zinc-300"></tbody>
+                <tbody id="stockTable" class="text-sm"></tbody>
             </table>
         </div>
 
-        <div class="text-center text-zinc-500 text-sm mt-8">
-            数据实时更新 • 完全本地运行 • 单文件版本
+        <div class="text-center text-gray-500 text-xs mt-8">
+            数据来自 apewisdom.io 公开 API · 每 5 分钟自动刷新一次
         </div>
     </div>
 
     <script>
-        async function loadData() {
-            const filter = document.getElementById('filter').value;
-            const tbody = document.querySelector('#dataTable tbody');
-            tbody.innerHTML = `
-                <tr><td colspan="6" class="text-center py-20">
-                    <i class="fas fa-spinner fa-spin text-4xl text-emerald-500"></i>
-                    <p class="mt-4">正在加载最新数据...</p>
-                </td></tr>
-            `;
+        let allStocks = [];
 
-            try {
-                const res = await fetch(`https://apewisdom.io/api/v1.0/filter/${filter}/page/1`);
-                const json = await res.json();
-                tbody.innerHTML = '';
-
-                json.results.forEach(item => {
-                    const change = item.rank_24h_ago 
-                        ? (item.rank_24h_ago > item.rank ? 'text-emerald-400' : 'text-red-400') 
-                        : 'text-zinc-500';
-                    
-                    const row = document.createElement('tr');
-                    row.className = "border-b border-zinc-800 hover:bg-zinc-900/50";
-                    row.innerHTML = `
-                        <td class="py-5 px-6 font-mono text-xl font-bold">#${item.rank}</td>
-                        <td class="py-5 px-6">
-                            <span class="ticker text-emerald-400 text-2xl font-bold">$${item.ticker}</span>
-                        </td>
-                        <td class="py-5 px-6 text-zinc-400">${item.name || '暂无中文名称'}</td>
-                        <td class="py-5 px-6 text-right font-mono text-2xl font-bold">${item.mentions.toLocaleString()}</td>
-                        <td class="py-5 px-6 text-center">
-                            <span class="${change} font-medium">
-                                ${item.rank_24h_ago ? `#${item.rank_24h_ago}` : '新上榜'}
-                            </span>
-                        </td>
-                        <td class="py-5 px-6 text-center">
-                            <a href="https://finance.yahoo.com/quote/${item.ticker}" target="_blank"
-                               class="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 mx-2">
-                                <i class="fas fa-chart-line"></i> Yahoo
-                            </a>
-                            <a href="https://www.tradingview.com/symbols/${item.ticker}" target="_blank"
-                               class="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 mx-2">
-                                <i class="fas fa-chart-bar"></i> TV
-                            </a>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-20 text-red-400">加载失败，请稍后刷新</td></tr>`;
-            }
+        // 计算 24h 变化百分比
+        function calcChange(current, previous) {
+            if (!previous || previous === 0) return { value: '新上榜', color: 'text-yellow-400' };
+            const change = ((current - previous) / previous) * 100;
+            const color = change > 0 ? 'text-emerald-400' : 'text-red-400';
+            return { value: change.toFixed(0) + '%', color };
         }
 
-        function filterTable() {
-            const input = document.getElementById('searchInput').value.toUpperCase();
-            const rows = document.querySelectorAll('#dataTable tbody tr');
+        // 渲染表格
+        function renderTable(stocks) {
+            const tbody = document.getElementById('stockTable');
+            tbody.innerHTML = '';
             
-            rows.forEach(row => {
-                const text = row.textContent.toUpperCase();
-                row.style.display = text.includes(input) ? '' : 'none';
+            stocks.forEach(stock => {
+                const change = calcChange(stock.mentions, stock.mentions_24h_ago);
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-800 last:border-none hover:bg-gray-800 transition';
+                row.innerHTML = `
+                    <td class="px-8 py-5 font-mono text-lg">${stock.rank}</td>
+                    <td class="px-8 py-5 font-medium">${stock.name}</td>
+                    <td class="px-8 py-5 font-mono text-emerald-400">${stock.ticker}</td>
+                    <td class="px-8 py-5 text-right font-medium">${parseInt(stock.mentions).toLocaleString()}</td>
+                    <td class="px-8 py-5 text-right font-medium ${change.color}">${change.value}</td>
+                    <td class="px-8 py-5 text-right font-medium">${parseInt(stock.upvotes).toLocaleString()}</td>
+                    <td class="px-8 py-5 text-center">
+                        <a href="https://interactivebrokers.com/mkt/?src=usstok${stock.ticker}&url=%2Fcn%2Fwhyib%2Foverview.php" 
+                           target="_blank"
+                           class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-2xl text-sm font-medium transition">
+                            <i class="fas fa-arrow-right"></i>
+                            买入
+                        </a>
+                    </td>
+                `;
+                tbody.appendChild(row);
             });
         }
 
-        // 页面加载完自动刷新
-        window.onload = loadData;
+        // 获取数据
+        async function fetchData() {
+            try {
+                const res = await fetch('https://apewisdom.io/api/v1.0/filter/all-stocks');
+                const data = await res.json();
+                allStocks = data.results;
+                renderTable(allStocks);
+            } catch (e) {
+                console.error(e);
+                alert('数据加载失败，请稍后刷新页面');
+            }
+        }
+
+        // 搜索功能
+        function filterStocks() {
+            const keyword = document.getElementById('searchInput').value.toUpperCase().trim();
+            if (!keyword) {
+                renderTable(allStocks);
+                return;
+            }
+            const filtered = allStocks.filter(stock => 
+                stock.ticker.includes(keyword) || 
+                stock.name.toUpperCase().includes(keyword)
+            );
+            renderTable(filtered);
+        }
+
+        // 刷新按钮
+        function refreshData() {
+            fetchData();
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchData();
+            
+            // 搜索事件
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', filterStocks);
+            
+            // 每5分钟自动刷新
+            setInterval(fetchData, 300000);
+            
+            // Tailwind 初始化
+            tailwind.config = { content: ["./**/*.{html,js}"] };
+        });
     </script>
 </body>
 </html>
