@@ -153,7 +153,6 @@
 
             let html = `<div class="flex items-center gap-1 text-sm bg-gray-900 rounded-3xl px-4 sm:px-6 py-3 border border-gray-800 min-w-max">`;
 
-            // 上一页
             html += `
                 <button onclick="goToPage(${currentPage - 1})" 
                         class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-xs sm:text-sm ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
@@ -161,7 +160,6 @@
                     上一页
                 </button>`;
 
-            // 页码
             for (let i = 1; i <= totalPages; i++) {
                 if (i === currentPage) {
                     html += `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium text-xs sm:text-sm">${i}</button>`;
@@ -170,7 +168,6 @@
                 }
             }
 
-            // 下一页
             html += `
                 <button onclick="goToPage(${currentPage + 1})" 
                         class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-xs sm:text-sm ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}"
@@ -180,7 +177,6 @@
 
             html += `</div>`;
 
-            // 当前页信息
             html += `
                 <div class="ml-4 text-gray-400 text-xs flex items-center gap-1 whitespace-nowrap">
                     第 <span class="text-emerald-400 font-medium">${currentPage}</span> / ${totalPages} 页
@@ -189,10 +185,10 @@
 
             pagination.innerHTML = html;
 
-            // 关键修复：每次渲染后自动滚动到最左侧，让第1页始终可见
-            setTimeout(() => {
+            // 关键修复：确保每次渲染后自动滚动到最左侧（第1页可见）
+            requestAnimationFrame(() => {
                 pagination.scrollLeft = 0;
-            }, 0);
+            });
         }
 
         function renderTableAndPagination() {
