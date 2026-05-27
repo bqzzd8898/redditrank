@@ -4,24 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>美股狐狸 | Reddit 实时股票热度榜</title>
+    
+    <!-- ✅ 新增：狐狸图标（favicon） -->
+    <!-- 使用和页面标题完全一致的 Twemoji 狐狸 SVG，无需额外上传文件 -->
+    <link rel="icon" type="image/svg+xml" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f98a.svg">
+    
+    <!-- 可选：为苹果设备优化（推荐保留） -->
+    <link rel="apple-touch-icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f98a.svg">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
         body { font-family: system-ui, -apple-system, sans-serif; }
         table { border-collapse: collapse; }
         tr:hover { background-color: #1f2937; }
-        
-        /* 手机端分页样式优化 */
-        @media (max-width: 767px) {
-            #pagination .desktop-pagination {
-                display: none;
-            }
-        }
-        @media (min-width: 768px) {
-            #pagination .mobile-pagination {
-                display: none;
-            }
-        }
     </style>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen">
@@ -73,7 +69,7 @@
             </div>
         </div>
 
-        <!-- 分页控件（已优化：手机端只显示 上一页 + 当前页 + 下一页） -->
+        <!-- 分页控件（已优化移动端） -->
         <div id="pagination" class="flex justify-center items-center gap-2 mt-8 flex-wrap"></div>
 
         <div class="text-center text-gray-500 text-xs mt-6">
@@ -128,10 +124,6 @@
             });
         }
 
-        function isMobile() {
-            return window.innerWidth < 768;
-        }
-
         function renderPagination() {
             const pagination = document.getElementById('pagination');
             const totalPages = Math.ceil(filteredStocks.length / itemsPerPage);
@@ -141,73 +133,73 @@
                 return;
             }
 
-            let html = '';
+            let pagesHtml = '';
 
-            if (isMobile()) {
-                // ==================== 手机端：仅显示 上一页 + 当前页 + 下一页 ====================
-                html += `
-                <div class="mobile-pagination flex items-center justify-center gap-3 text-sm bg-gray-900 rounded-3xl px-6 py-3 border border-gray-800 w-full max-w-[320px]">
-                    <!-- 上一页 -->
-                    <button onclick="goToPage(${currentPage - 1})" 
-                            class="flex-1 px-6 py-3 rounded-2xl border border-gray-700 hover:bg-gray-800 transition flex items-center justify-center gap-2 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
-                            ${currentPage === 1 ? 'disabled' : ''}>
-                        <i class="fas fa-chevron-left"></i>
-                        上一页
-                    </button>
+            // 上一页
+            pagesHtml += `
+                <button onclick="goToPage(${currentPage - 1})" 
+                        class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-sm font-medium ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
+                        ${currentPage === 1 ? 'disabled' : ''}>
+                    上一页
+                </button>`;
 
-                    <!-- 当前页 -->
-                    <div class="px-8 py-3 bg-emerald-500 text-white font-medium rounded-2xl text-base flex items-center justify-center min-w-[110px]">
-                        ${currentPage} / ${totalPages}
-                    </div>
-
-                    <!-- 下一页 -->
-                    <button onclick="goToPage(${currentPage + 1})" 
-                            class="flex-1 px-6 py-3 rounded-2xl border border-gray-700 hover:bg-gray-800 transition flex items-center justify-center gap-2 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}"
-                            ${currentPage === totalPages ? 'disabled' : ''}>
-                        下一页
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>`;
-            } else {
-                // ==================== 桌面端：保持原有完整分页 ====================
-                html += `<div class="desktop-pagination flex items-center gap-1 text-sm bg-gray-900 rounded-3xl px-6 py-3 border border-gray-800">`;
-
-                // 上一页
-                html += `
-                    <button onclick="goToPage(${currentPage - 1})" 
-                            class="px-5 py-2 rounded-2xl border border-gray-700 hover:bg-gray-800 transition ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
-                            ${currentPage === 1 ? 'disabled' : ''}>
-                        上一页
-                    </button>`;
-
-                // 所有页码
+            // 智能分页逻辑（移动端友好）
+            if (totalPages <= 8) {
                 for (let i = 1; i <= totalPages; i++) {
                     if (i === currentPage) {
-                        html += `<button onclick="goToPage(${i})" class="px-5 py-2 rounded-2xl bg-emerald-500 text-white font-medium">${i}</button>`;
+                        pagesHtml += `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium min-w-[40px]">${i}</button>`;
                     } else {
-                        html += `<button onclick="goToPage(${i})" class="px-5 py-2 rounded-2xl border border-gray-700 hover:bg-gray-800 transition">${i}</button>`;
+                        pagesHtml += `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">${i}</button>`;
+                    }
+                }
+            } else {
+                if (currentPage === 1) {
+                    pagesHtml += `<button class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium min-w-[40px]">1</button>`;
+                } else {
+                    pagesHtml += `<button onclick="goToPage(1)" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">1</button>`;
+                }
+
+                if (currentPage > 4) {
+                    pagesHtml += `<span class="px-2 text-gray-500 font-medium">...</span>`;
+                }
+
+                const startPage = Math.max(2, currentPage - 2);
+                const endPage = Math.min(totalPages - 1, currentPage + 2);
+                for (let i = startPage; i <= endPage; i++) {
+                    if (i === currentPage) {
+                        pagesHtml += `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium min-w-[40px]">${i}</button>`;
+                    } else {
+                        pagesHtml += `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">${i}</button>`;
                     }
                 }
 
-                // 下一页
-                html += `
-                    <button onclick="goToPage(${currentPage + 1})" 
-                            class="px-5 py-2 rounded-2xl border border-gray-700 hover:bg-gray-800 transition ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}"
-                            ${currentPage === totalPages ? 'disabled' : ''}>
-                        下一页
-                    </button>`;
+                if (currentPage < totalPages - 3) {
+                    pagesHtml += `<span class="px-2 text-gray-500 font-medium">...</span>`;
+                }
 
-                html += `</div>`;
+                if (currentPage === totalPages) {
+                    pagesHtml += `<button class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium min-w-[40px]">${totalPages}</button>`;
+                } else {
+                    pagesHtml += `<button onclick="goToPage(${totalPages})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">${totalPages}</button>`;
+                }
             }
 
-            // 页码信息（手机和桌面都显示）
-            html += `
-                <div class="ml-4 text-gray-400 text-xs flex items-center gap-1 mt-2 sm:mt-0">
-                    第 <span class="text-emerald-400 font-medium">${currentPage}</span> / ${totalPages} 页
-                    <span class="text-gray-500">· 共 ${filteredStocks.length} 只股票</span>
-                </div>`;
+            // 下一页
+            pagesHtml += `
+                <button onclick="goToPage(${currentPage + 1})" 
+                        class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-sm font-medium ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}"
+                        ${currentPage === totalPages ? 'disabled' : ''}>
+                    下一页
+                </button>`;
 
-            pagination.innerHTML = html;
+            pagination.innerHTML = `
+                <div class="flex items-center gap-1 bg-gray-900 rounded-3xl px-4 sm:px-6 py-3 border border-gray-800 flex-wrap justify-center">
+                    ${pagesHtml}
+                </div>
+                <div class="mt-4 sm:mt-0 sm:ml-6 text-gray-400 text-xs flex items-center justify-center sm:justify-start gap-1">
+                    第 <span class="text-emerald-400 font-medium">${currentPage}</span> / ${totalPages} 页
+                    <span class="text-gray-500 hidden sm:inline">· 共 ${filteredStocks.length} 只股票</span>
+                </div>`;
         }
 
         function renderTableAndPagination() {
@@ -276,20 +268,11 @@
             fetchData();
         }
 
-        // 窗口大小改变时自动切换分页样式
-        function handleResize() {
-            renderPagination();
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
             fetchData();
             const searchInput = document.getElementById('searchInput');
             searchInput.addEventListener('input', filterStocks);
             setInterval(fetchData, 300000);
-            
-            // 监听窗口大小变化（手机↔桌面切换时自动更新分页样式）
-            window.addEventListener('resize', handleResize);
-            
             tailwind.config = { content: ["./**/*.{html,js}"] };
         });
     </script>
