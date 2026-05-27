@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>美股狐狸 | Reddit 实时股票热度榜</title>
     
-    <!-- ✅ 新增：狐狸图标（favicon） -->
-    <!-- 使用和页面标题完全一致的 Twemoji 狐狸 SVG，无需额外上传文件 -->
     <link rel="icon" type="image/svg+xml" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f98a.svg">
-    
-    <!-- 可选：为苹果设备优化（推荐保留） -->
     <link rel="apple-touch-icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f98a.svg">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -69,7 +65,7 @@
             </div>
         </div>
 
-        <!-- 分页控件（已优化移动端） -->
+        <!-- 分页控件 -->
         <div id="pagination" class="flex justify-center items-center gap-2 mt-8 flex-wrap"></div>
 
         <div class="text-center text-gray-500 text-xs mt-6">
@@ -127,7 +123,6 @@
         function renderPagination() {
             const pagination = document.getElementById('pagination');
             const totalPages = Math.ceil(filteredStocks.length / itemsPerPage);
-            
             if (totalPages <= 1) {
                 pagination.innerHTML = '';
                 return;
@@ -135,15 +130,8 @@
 
             let pagesHtml = '';
 
-            // 上一页
-            pagesHtml += `
-                <button onclick="goToPage(${currentPage - 1})" 
-                        class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-sm font-medium ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
-                        ${currentPage === 1 ? 'disabled' : ''}>
-                    上一页
-                </button>`;
+            pagesHtml += `<button onclick="goToPage(${currentPage - 1})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-sm font-medium ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>`;
 
-            // 智能分页逻辑（移动端友好）
             if (totalPages <= 8) {
                 for (let i = 1; i <= totalPages; i++) {
                     if (i === currentPage) {
@@ -153,15 +141,10 @@
                     }
                 }
             } else {
-                if (currentPage === 1) {
-                    pagesHtml += `<button class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium min-w-[40px]">1</button>`;
-                } else {
-                    pagesHtml += `<button onclick="goToPage(1)" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">1</button>`;
-                }
+                if (currentPage === 1) pagesHtml += `<button class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium min-w-[40px]">1</button>`;
+                else pagesHtml += `<button onclick="goToPage(1)" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">1</button>`;
 
-                if (currentPage > 4) {
-                    pagesHtml += `<span class="px-2 text-gray-500 font-medium">...</span>`;
-                }
+                if (currentPage > 4) pagesHtml += `<span class="px-2 text-gray-500 font-medium">...</span>`;
 
                 const startPage = Math.max(2, currentPage - 2);
                 const endPage = Math.min(totalPages - 1, currentPage + 2);
@@ -173,24 +156,13 @@
                     }
                 }
 
-                if (currentPage < totalPages - 3) {
-                    pagesHtml += `<span class="px-2 text-gray-500 font-medium">...</span>`;
-                }
+                if (currentPage < totalPages - 3) pagesHtml += `<span class="px-2 text-gray-500 font-medium">...</span>`;
 
-                if (currentPage === totalPages) {
-                    pagesHtml += `<button class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium min-w-[40px]">${totalPages}</button>`;
-                } else {
-                    pagesHtml += `<button onclick="goToPage(${totalPages})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">${totalPages}</button>`;
-                }
+                if (currentPage === totalPages) pagesHtml += `<button class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium min-w-[40px]">${totalPages}</button>`;
+                else pagesHtml += `<button onclick="goToPage(${totalPages})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">${totalPages}</button>`;
             }
 
-            // 下一页
-            pagesHtml += `
-                <button onclick="goToPage(${currentPage + 1})" 
-                        class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-sm font-medium ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}"
-                        ${currentPage === totalPages ? 'disabled' : ''}>
-                    下一页
-                </button>`;
+            pagesHtml += `<button onclick="goToPage(${currentPage + 1})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-sm font-medium ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>`;
 
             pagination.innerHTML = `
                 <div class="flex items-center gap-1 bg-gray-900 rounded-3xl px-4 sm:px-6 py-3 border border-gray-800 flex-wrap justify-center">
@@ -224,12 +196,15 @@
                     ? 'https://apewisdom.io/api/v1.0/filter/all-stocks' 
                     : `https://apewisdom.io/api/v1.0/filter/all-stocks/page/${page}`;
                 
-                // ✅ 已更换为更稳定的 allorigins.win 代理（解决自定义域名 + HTTPS 后 API 无法加载的问题）
-                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
+                // ✅ 换成 codetabs 代理（对自定义域名 + HTTPS 兼容性更好）
+                const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(apiUrl)}`;
                 
                 try {
                     const res = await fetch(proxyUrl);
-                    if (!res.ok) break;
+                    if (!res.ok) {
+                        console.error('HTTP error:', res.status);
+                        break;
+                    }
                     const data = await res.json();
                     
                     if (data.results && data.results.length > 0) {
@@ -240,7 +215,7 @@
                     if (data.pages) totalPages = data.pages;
                     page++;
                 } catch (e) {
-                    console.error(e);
+                    console.error('API 请求失败:', e);
                     break;
                 }
             }
