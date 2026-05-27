@@ -69,7 +69,7 @@
         <div id="pagination" class="flex justify-center items-center gap-2 mt-8 flex-wrap"></div>
 
         <div class="text-center text-gray-500 text-xs mt-6">
-            每 5 分钟自动刷新一次
+            每 5 分钟自动刷新一次 · 已使用 corsproxy.io 并行抓取（方案1）
         </div>
     </div>
 
@@ -186,44 +186,56 @@
             renderTableAndPagination();
         }
 
+        // ==================== 方案1 核心代码（已替换）====================
         async function fetchData() {
-            let stocks = [];
-            let page = 1;
-            let totalPages = 20;
+            try {
+                const baseApi = 'https://apewisdom.io/api/v1.0/filter/all-stocks';
+                
+                // ✅ 使用 corsproxy.io（目前最快的免费代理）
+                const getProxyUrl = (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`;
 
-            while (page <= totalPages) {
-                const apiUrl = page === 1 
-                    ? 'https://apewisdom.io/api/v1.0/filter/all-stocks' 
-                    : `https://apewisdom.io/api/v1.0/filter/all-stocks/page/${page}`;
+                console.log('🚀 开始抓取数据...');
+
+                // 第一页（同时拿到总页数）
+                const firstRes = await fetch(getProxyUrl(baseApi));
+                if (!firstRes.ok) throw new Error('第一页请求失败');
                 
-                // ✅ 换成 codetabs 代理（对自定义域名 + HTTPS 兼容性更好）
-                const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(apiUrl)}`;
-                
-                try {
-                    const res = await fetch(proxyUrl);
-                    if (!res.ok) {
-                        console.error('HTTP error:', res.status);
-                        break;
-                    }
-                    const data = await res.json();
-                    
-                    if (data.results && data.results.length > 0) {
-                        stocks = stocks.concat(data.results);
-                    } else {
-                        break;
-                    }
-                    if (data.pages) totalPages = data.pages;
-                    page++;
-                } catch (e) {
-                    console.error('API 请求失败:', e);
-                    break;
+                const firstData = await firstRes.json();
+                let allStocks = firstData.results || [];
+                const totalPages = Math.min(firstData.pages || 15, 15); // 最多抓15页，够用了
+
+                // 并行抓取剩余页面（这就是速度飞起的关键！）
+                const pagePromises = [];
+                for (let page = 2; page <= totalPages; page++) {
+                    const pageUrl = `https://apewisdom.io/api/v1.0/filter/all-stocks/page/${page}`;
+                    pagePromises.push(
+                        fetch(getProxyUrl(pageUrl))
+                            .then(res => res.ok ? res.json() : null)
+                            .catch(() => null)
+                    );
                 }
-            }
 
-            allStocks = stocks;
-            filteredStocks = [...stocks];
-            currentPage = 1;
-            renderTableAndPagination();
+                const pageResults = await Promise.all(pagePromises);
+                
+                pageResults.forEach(data => {
+                    if (data && data.results && data.results.length > 0) {
+                        allStocks = allStocks.concat(data.results);
+                    }
+                });
+
+                allStocks = allStocks.filter(Boolean); // 清理空数据
+
+                // 更新全局数据
+                allStocks = allStocks;
+                filteredStocks = [...allStocks];
+                currentPage = 1;
+                renderTableAndPagination();
+
+                console.log(`✅ 成功抓取 ${allStocks.length} 条股票数据，加载完成！`);
+            } catch (e) {
+                console.error('❌ 数据抓取失败:', e);
+                alert('数据加载有点慢，请点击“刷新数据”按钮再试一次');
+            }
         }
 
         function filterStocks() {
