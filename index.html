@@ -39,19 +39,19 @@
                    class="w-full bg-gray-900 border border-gray-700 rounded-3xl px-6 py-4 text-base sm:text-lg focus:outline-none focus:border-emerald-500 transition">
         </div>
 
-        <!-- 数据表格 - 手机端可左右滑动 -->
+        <!-- 数据表格 -->
         <div class="bg-gray-900 rounded-3xl overflow-hidden border border-gray-800">
             <div class="overflow-x-auto">
-                <table class="w-full min-w-[640px]">
+                <table class="w-full min-w-[680px]">
                     <thead>
-                        <tr class="border-b border-gray-800 text-emerald-400 text-left">
-                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium w-12">排名</th>
-                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium">股票名称</th>
-                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium">代码</th>
-                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium text-right">提及次数</th>
-                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium text-right">24h 变化</th>
-                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium text-right">点赞数</th>
-                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium text-center">操作</th>
+                        <tr class="border-b border-gray-800 text-emerald-400 text-left text-sm">
+                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium whitespace-nowrap">排名</th>
+                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium whitespace-nowrap">股票名称</th>
+                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium whitespace-nowrap">代码</th>
+                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium whitespace-nowrap text-right">提及次数</th>
+                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium whitespace-nowrap text-right">24h 变化</th>
+                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium whitespace-nowrap text-right">点赞数</th>
+                            <th class="px-4 sm:px-8 py-4 sm:py-5 font-medium whitespace-nowrap text-center">操作</th>
                         </tr>
                     </thead>
                     <tbody id="stockTable" class="text-sm"></tbody>
@@ -85,8 +85,8 @@
                 row.className = 'border-b border-gray-800 last:border-none hover:bg-gray-800 transition';
                 row.innerHTML = `
                     <td class="px-4 sm:px-8 py-4 sm:py-5 font-mono text-base">${stock.rank}</td>
-                    <td class="px-4 sm:px-8 py-4 sm:py-5 font-medium">${stock.name}</td>
-                    <td class="px-4 sm:px-8 py-4 sm:py-5 font-mono text-emerald-400">${stock.ticker}</td>
+                    <td class="px-4 sm:px-8 py-4 sm:py-5 font-medium text-base">${stock.name}</td>
+                    <td class="px-4 sm:px-8 py-4 sm:py-5 font-mono text-emerald-400 text-base">${stock.ticker}</td>
                     <td class="px-4 sm:px-8 py-4 sm:py-5 text-right font-medium">${parseInt(stock.mentions).toLocaleString()}</td>
                     <td class="px-4 sm:px-8 py-4 sm:py-5 text-right font-medium ${change.color}">${change.value}</td>
                     <td class="px-4 sm:px-8 py-4 sm:py-5 text-right font-medium">${parseInt(stock.upvotes).toLocaleString()}</td>
@@ -140,7 +140,7 @@
             fetchData();
             const searchInput = document.getElementById('searchInput');
             searchInput.addEventListener('input', filterStocks);
-            setInterval(fetchData, 300000); // 每5分钟自动刷新
+            setInterval(fetchData, 300000);
             tailwind.config = { content: ["./**/*.{html,js}"] };
         });
     </script>
