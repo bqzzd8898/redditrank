@@ -27,7 +27,7 @@
 
         /* 手机端分页优化 */
         #pagination {
-            scrollbar-width: none; /* 隐藏滚动条 */
+            scrollbar-width: none;
         }
         #pagination::-webkit-scrollbar {
             display: none;
@@ -39,10 +39,14 @@
         <!-- 头部 -->
         <div class="flex justify-between items-center mb-8 sm:mb-10">
             <div class="flex items-center gap-3">
+                <!-- 狐狸图标（全设备一致） -->
                 <img src="https://twemoji.maxcdn.com/v/latest/svg/1f98a.svg" 
                      alt="狐狸" 
                      class="fox-icon">
-                <h1 class="text-3xl sm:text-4xl font-bold">美股狐狸</h1>
+                <div>
+                    <h1 class="text-3xl sm:text-4xl font-bold">美股狐狸</h1>
+                    <p class="text-gray-400 mt-1 text-sm sm:text-base">过去 24 小时 Reddit 提及最多的股票 · 实时更新</p>
+                </div>
             </div>
             <div>
                 <button onclick="refreshData()" 
@@ -145,7 +149,6 @@
 
             let html = `<div class="flex items-center gap-1 text-sm bg-gray-900 rounded-3xl px-4 sm:px-6 py-3 border border-gray-800 min-w-max">`;
 
-            // 上一页
             html += `
                 <button onclick="goToPage(${currentPage - 1})" 
                         class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-xs sm:text-sm ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
@@ -153,7 +156,6 @@
                     上一页
                 </button>`;
 
-            // 页码按钮（手机端也清晰）
             for (let i = 1; i <= totalPages; i++) {
                 if (i === currentPage) {
                     html += `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium text-xs sm:text-sm">${i}</button>`;
@@ -162,7 +164,6 @@
                 }
             }
 
-            // 下一页
             html += `
                 <button onclick="goToPage(${currentPage + 1})" 
                         class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-xs sm:text-sm ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}"
@@ -172,7 +173,6 @@
 
             html += `</div>`;
 
-            // 当前页信息
             html += `
                 <div class="ml-4 text-gray-400 text-xs flex items-center gap-1 whitespace-nowrap">
                     第 <span class="text-emerald-400 font-medium">${currentPage}</span> / ${totalPages} 页
