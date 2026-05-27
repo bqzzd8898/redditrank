@@ -186,13 +186,11 @@
             renderTableAndPagination();
         }
 
-        // ==================== 方案3 核心代码（关键在这里改地址）====================
+        // ==================== 方案3 核心代码（已填好你的Worker地址）====================
         async function fetchData() {
             try {
-                // ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
-                // 这里改成你刚才复制的 Worker 地址！！！
+                // 你的Worker地址（已正确填写）
                 const apiUrl = 'https://meiguhuli-cache.bqzzd888.workers.dev';
-                // ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
 
                 const res = await fetch(apiUrl);
                 if (!res.ok) throw new Error('缓存请求失败');
