@@ -224,7 +224,8 @@
                     ? 'https://apewisdom.io/api/v1.0/filter/all-stocks' 
                     : `https://apewisdom.io/api/v1.0/filter/all-stocks/page/${page}`;
                 
-                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
+                // ✅ 已更换为更稳定的 allorigins.win 代理（解决自定义域名 + HTTPS 后 API 无法加载的问题）
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
                 
                 try {
                     const res = await fetch(proxyUrl);
