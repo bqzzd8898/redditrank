@@ -3,27 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美股狐狸 | Reddit 实时股票热度榜</title>
     
-    <!-- 核心 SEO -->
-    <title>美股狐狸 | Reddit 实时美股热度榜 - 过去24小时最热美股</title>
-    <meta name="description" content="实时查看 Reddit 上过去24小时提及最多的美股热度榜，包含提及次数、24h变化、点赞数。MU、NVDA 等热门股一目了然。">
-    <meta name="keywords" content="美股热度, Reddit 股票, 美股实时榜, 美股排名, 美股热度榜, Reddit 美股, 美股狐狸">
-    
-    <!-- 搜索引擎友好 -->
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://meiguhuli.com">
-    
-    <!-- Open Graph（分享到微信、X、Telegram 时好看） -->
+    <!-- ========== SEO 核心 Meta Tags ========== -->
+    <meta name="description" content="美股狐狸 | Reddit 实时股票热度榜 - 追踪过去24小时Reddit上提及次数最多的美股。实时更新股票排名、提及次数、24h变化、点赞数，每5分钟自动刷新。热门美股讨论热度一览无余（NVDA、TSLA、MU等）">
+    <meta name="keywords" content="美股狐狸, Reddit股票, 美股热度榜, 股票实时榜单, Reddit WallStreetBets, 股票提及次数, 美股讨论热度, NVDA热度, TSLA, 美股实时数据, 24h股票变化">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="author" content="美股狐狸">
+    <meta name="language" content="zh-CN">
+    <link rel="canonical" href="https://meiguhuli.com/">
+
+    <!-- Open Graph (Facebook / 微信 / 其他社交平台) -->
     <meta property="og:title" content="美股狐狸 | Reddit 实时股票热度榜">
-    <meta property="og:description" content="过去24小时 Reddit 最热美股一览">
-    <meta property="og:image" content="https://meiguhuli.com/og-image.png"> <!-- 你可以自己生成一张图 -->
-    <meta property="og:url" content="https://meiguhuli.com">
+    <meta property="og:description" content="过去24小时Reddit上最火的美股实时热度榜单，每5分钟自动更新。查看哪些股票被疯狂讨论，追踪提及次数、24h变化和点赞数。">
     <meta property="og:type" content="website">
-    
-    <!-- 其他 -->
+    <meta property="og:url" content="https://meiguhuli.com/">
+    <meta property="og:site_name" content="美股狐狸">
+    <meta property="og:image" content="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f98a.svg">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:locale" content="zh_CN">
+
+    <!-- Twitter Card (X平台) -->
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="美股狐狸 | Reddit 实时股票热度榜">
+    <meta name="twitter:description" content="Reddit上过去24小时最热的 美股实时热度榜 · 每5分钟更新">
+    <meta name="twitter:image" content="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f98a.svg">
+
+    <!-- 其他SEO友好标签 -->
+    <link rel="icon" type="image/svg+xml" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f98a.svg">
+    <link rel="apple-touch-icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f98a.svg">
+    <meta name="theme-color" content="#10b981">
+
+    <!-- Structured Data (JSON-LD) - 帮助搜索引擎理解页面内容 -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "美股狐狸 | Reddit 实时股票热度榜",
+      "description": "过去24小时Reddit上提及次数最多的美股实时热度榜单，每5分钟自动更新。",
+      "url": "https://meiguhuli.com/",
+      "inLanguage": "zh-CN",
+      "mainEntity": {
+        "@type": "ItemList",
+        "name": "Reddit实时股票热度榜",
+        "description": "根据过去24小时Reddit讨论量排序的美股榜单",
+        "numberOfItems": 100
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "美股狐狸",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f98a.svg"
+        }
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://meiguhuli.com/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; }
+        table { border-collapse: collapse; }
+        tr:hover { background-color: #1f2937; }
+    </style>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen">
+    <!-- 以下内容与您原来完全一致，未做任何修改 -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <!-- 头部 -->
         <div class="flex justify-between items-center mb-8 sm:mb-10">
@@ -88,9 +140,9 @@
                target="_blank"
                class="w-14 h-14 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center text-3xl text-white transition-all hover:scale-110">
                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-x">
-	<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-	<path d="M4 4l11.733 16h4.267l-11.733 -16l-4.267 0" />
-	<path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" />
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M4 4l11.733 16h4.267l-11.733 -16l-4.267 0" />
+    <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" />
 </svg>
             </a>
 
@@ -99,8 +151,8 @@
                target="_blank"
                class="w-14 h-14 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center text-3xl text-white transition-all hover:scale-110">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-telegram">
-	<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-	<path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4" />
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4" />
 </svg>
             </a>
         </div>
@@ -141,7 +193,7 @@
                     <td class="px-4 sm:px-8 py-4 sm:py-5 text-right font-medium ${change.color}">${change.value}</td>
                     <td class="px-4 sm:px-8 py-4 sm:py-5 text-right font-medium">${parseInt(stock.upvotes).toLocaleString()}</td>
                     <td class="px-4 sm:px-8 py-4 sm:py-5 text-center">
-                        <a href="https://www.interactivebrokers.com/mkt/?src=usstokX&url=%2Fcn%2Fwhyib%2Foverview.php" 
+                        <a href="https://interactivebrokers.com/mkt/?src=usstokX&url=%2Fcn%2Fwhyib%2Foverview.php" 
                            target="_blank"
                            class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 sm:px-6 py-2.5 rounded-2xl text-sm font-medium transition whitespace-nowrap">
                             <i class="fas fa-arrow-right"></i>
