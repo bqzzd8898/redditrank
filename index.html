@@ -5,48 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>美股狐狸 | Reddit 实时股票热度榜</title>
     
-    <!-- 关键加速：预加载关键资源 -->
-    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="icon" type="image/svg+xml" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f98a.svg">
+    <link rel="apple-touch-icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f98a.svg">
     
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBzdHJva2U9Im5vbmUiIGQ9Ik0wIDBoMjR2MjRIMFYweiIvPjxwYXRoIGQ9Ik0xMiA0TDQgMTJsOCA4IDgtOCIvPjxwYXRoIGQ9Ik0xMiA0djE2Ii8+PC9zdmc+">
-    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBzdHJva2U9Im5vbmUiIGQ9Ik0wIDBoMjR2MjRIMFYweiIvPjxwYXRoIGQ9Ik0xMiA0TDQgMTJsOCA4IDgtOCIvPjxwYXRoIGQ9Ik0xMiA0djE2Ii8+PC9zdmc+">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    
     <style>
         body { font-family: system-ui, -apple-system, sans-serif; }
         table { border-collapse: collapse; }
         tr:hover { background-color: #1f2937; }
-        /* 轻微优化滚动和渲染 */
-        .overflow-x-auto { -webkit-overflow-scrolling: touch; }
     </style>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        <!-- 头部（不变） -->
+        <!-- 头部 -->
         <div class="flex justify-between items-center mb-8 sm:mb-10">
             <div>
                 <h1 class="text-3xl sm:text-4xl font-bold flex items-center gap-3">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBzdHJva2U9Im5vbmUiIGQ9Ik0wIDBoMjR2MjRIMFYweiIvPjxwYXRoIGQ9Ik0xMiA0TDQgMTJsOCA4IDgtOCIvPjxwYXRoIGQ9Ik0xMiA0djE2Ii8+PC9zdmc+" alt="🦊" class="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
+                    <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f98a.svg" 
+                         alt="🦊" 
+                         class="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
                     美股狐狸
                 </h1>
                 <p class="text-gray-400 mt-1 text-sm sm:text-base">过去 24 小时 Reddit 提及最多的股票 · 实时更新</p>
             </div>
             <div>
-                <a href="https://t.me/" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 px-5 sm:px-6 py-3 rounded-2xl font-medium flex items-center gap-2 transition text-sm sm:text-base">
-                    <i class="fab fa-telegram"></i> 进美股群
+                <a href="https://t.me/" 
+                   target="_blank"
+                   class="bg-emerald-500 hover:bg-emerald-600 px-5 sm:px-6 py-3 rounded-2xl font-medium flex items-center gap-2 transition text-sm sm:text-base">
+                    <i class="fab fa-telegram"></i> 
+                    进美股群
                 </a>
             </div>
         </div>
 
         <!-- 搜索框 -->
         <div class="mb-6">
-            <input id="searchInput" type="text" placeholder="搜索股票代码或名称（如 MU、NVDA）..." class="w-full bg-gray-900 border border-gray-700 rounded-3xl px-6 py-4 text-base sm:text-lg focus:outline-none focus:border-emerald-500 transition">
+            <input id="searchInput" 
+                   type="text" 
+                   placeholder="搜索股票代码或名称（如 MU、NVDA）..."
+                   class="w-full bg-gray-900 border border-gray-700 rounded-3xl px-6 py-4 text-base sm:text-lg focus:outline-none focus:border-emerald-500 transition">
         </div>
 
-        <!-- 数据表格（不变） -->
+        <!-- 数据表格 -->
         <div class="bg-gray-900 rounded-3xl overflow-hidden border border-gray-800">
             <div class="overflow-x-auto">
                 <table class="w-full min-w-[680px]">
@@ -66,21 +67,34 @@
             </div>
         </div>
 
-        <!-- 分页（不变） -->
+        <!-- 分页控件 -->
         <div id="pagination" class="flex justify-center items-center gap-2 mt-8 flex-wrap"></div>
 
         <div class="text-center text-gray-500 text-xs mt-6">
             每 5 分钟自动刷新一次
         </div>
 
-        <!-- 底部图标（不变） -->
+        <!-- 最下方两个风格完全统一的 Tabler Icons -->
         <div class="flex justify-center items-center gap-10 mt-12 mb-8">
-            <!-- X 和 Telegram 图标保持不变 -->
-            <a href="https://x.com/" target="_blank" class="w-14 h-14 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center text-3xl text-white transition-all hover:scale-110">
-               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 4l11.733 16h4.267l-11.733 -16l-4.267 0"/><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"/></svg>
+            <!-- X (brand-x) -->
+            <a href="https://x.com/" 
+               target="_blank"
+               class="w-14 h-14 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center text-3xl text-white transition-all hover:scale-110">
+               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-x">
+	<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+	<path d="M4 4l11.733 16h4.267l-11.733 -16l-4.267 0" />
+	<path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" />
+</svg>
             </a>
-            <a href="https://t.me/" target="_blank" class="w-14 h-14 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center text-3xl text-white transition-all hover:scale-110">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4"/></svg>
+
+            <!-- Telegram (brand-telegram) -->
+            <a href="https://t.me/" 
+               target="_blank"
+               class="w-14 h-14 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center text-3xl text-white transition-all hover:scale-110">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-telegram">
+	<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+	<path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4" />
+</svg>
             </a>
         </div>
     </div>
@@ -90,9 +104,8 @@
         let filteredStocks = [];
         let currentPage = 1;
         const itemsPerPage = 100;
-        let searchTimeout;
 
-        function calcChange(current, previous) { /* 你的原函数不变 */ 
+        function calcChange(current, previous) {
             if (!previous || previous === 0 || previous === null) {
                 return { value: '新上榜', color: 'text-yellow-400' };
             }
@@ -101,12 +114,12 @@
             return { value: (change > 0 ? '+' : '') + change.toFixed(0) + '%', color };
         }
 
-        function getPaginatedStocks() { /* 原函数不变 */ 
+        function getPaginatedStocks() {
             const start = (currentPage - 1) * itemsPerPage;
             return filteredStocks.slice(start, start + itemsPerPage);
         }
 
-        function renderTable(stocks) { /* 原函数不变，但修复了买入链接 */ 
+        function renderTable(stocks) {
             const tbody = document.getElementById('stockTable');
             tbody.innerHTML = '';
             stocks.forEach(stock => {
@@ -124,7 +137,8 @@
                         <a href="https://interactivebrokers.com/mkt/?src=usstokX&url=%2Fcn%2Fwhyib%2Foverview.php" 
                            target="_blank"
                            class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 sm:px-6 py-2.5 rounded-2xl text-sm font-medium transition whitespace-nowrap">
-                            <i class="fas fa-arrow-right"></i> 买入
+                            <i class="fas fa-arrow-right"></i>
+                            买入
                         </a>
                     </td>
                 `;
@@ -132,25 +146,90 @@
             });
         }
 
-        /* renderPagination、renderTableAndPagination、goToPage 全部保持你原来的代码（未改动） */
-        function renderPagination() { /* ...你的原代码... */ }
-        function renderTableAndPagination() { /* ...你的原代码... */ }
-        function goToPage(page) { /* ...你的原代码... */ }
+        function renderPagination() {
+            const pagination = document.getElementById('pagination');
+            const totalPages = Math.ceil(filteredStocks.length / itemsPerPage);
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let pagesHtml = '';
+
+            pagesHtml += `<button onclick="goToPage(${currentPage - 1})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-sm font-medium ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>`;
+
+            if (totalPages <= 8) {
+                for (let i = 1; i <= totalPages; i++) {
+                    if (i === currentPage) {
+                        pagesHtml += `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium min-w-[40px]">${i}</button>`;
+                    } else {
+                        pagesHtml += `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">${i}</button>`;
+                    }
+                }
+            } else {
+                if (currentPage === 1) pagesHtml += `<button class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium min-w-[40px]">1</button>`;
+                else pagesHtml += `<button onclick="goToPage(1)" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">1</button>`;
+
+                if (currentPage > 4) pagesHtml += `<span class="px-2 text-gray-500 font-medium">...</span>`;
+
+                const startPage = Math.max(2, currentPage - 2);
+                const endPage = Math.min(totalPages - 1, currentPage + 2);
+                for (let i = startPage; i <= endPage; i++) {
+                    if (i === currentPage) {
+                        pagesHtml += `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium min-w-[40px]">${i}</button>`;
+                    } else {
+                        pagesHtml += `<button onclick="goToPage(${i})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">${i}</button>`;
+                    }
+                }
+
+                if (currentPage < totalPages - 3) pagesHtml += `<span class="px-2 text-gray-500 font-medium">...</span>`;
+
+                if (currentPage === totalPages) pagesHtml += `<button class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-white font-medium min-w-[40px]">${totalPages}</button>`;
+                else pagesHtml += `<button onclick="goToPage(${totalPages})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition min-w-[40px]">${totalPages}</button>`;
+            }
+
+            pagesHtml += `<button onclick="goToPage(${currentPage + 1})" class="px-4 py-2.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition text-sm font-medium ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>`;
+
+            pagination.innerHTML = `
+                <div class="flex items-center gap-1 bg-gray-900 rounded-3xl px-4 sm:px-6 py-3 border border-gray-800 flex-wrap justify-center">
+                    ${pagesHtml}
+                </div>
+                <div class="mt-4 sm:mt-0 sm:ml-6 text-gray-400 text-xs flex items-center justify-center sm:justify-start gap-1">
+                    第 <span class="text-emerald-400 font-medium">${currentPage}</span> / ${totalPages} 页
+                    <span class="text-gray-500 hidden sm:inline">· 共 ${filteredStocks.length} 只股票</span>
+                </div>`;
+        }
+
+        function renderTableAndPagination() {
+            renderTable(getPaginatedStocks());
+            renderPagination();
+        }
+
+        function goToPage(page) {
+            const totalPages = Math.ceil(filteredStocks.length / itemsPerPage);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderTableAndPagination();
+        }
 
         async function fetchData() {
             try {
                 const apiUrl = 'https://cache.meiguhuli.com';
-                const res = await fetch(apiUrl, { cache: 'default' });  // 关键加速！
+
+                const res = await fetch(apiUrl);
                 if (!res.ok) throw new Error('缓存请求失败');
                 
                 const data = await res.json();
+                
                 allStocks = data.results || [];
                 filteredStocks = [...allStocks];
                 currentPage = 1;
                 renderTableAndPagination();
+
                 console.log(`✅ 缓存数据加载完成：${allStocks.length} 条`);
             } catch (e) {
                 console.error('❌ 缓存加载失败:', e);
+                alert('数据加载失败，请稍后刷新重试');
             }
         }
 
@@ -168,30 +247,15 @@
             renderTableAndPagination();
         }
 
+        function refreshData() {
+            fetchData();
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             fetchData();
-
-            // 1. 搜索防抖（输入时不会疯狂重绘）
             const searchInput = document.getElementById('searchInput');
-            searchInput.addEventListener('input', () => {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(filterStocks, 150);
-            });
-
-            // 2. 页面可见时才刷新（大幅减少后台无效请求）
-            let lastRefresh = Date.now();
-            document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'visible' && Date.now() - lastRefresh > 240000) {
-                    fetchData();
-                    lastRefresh = Date.now();
-                }
-            });
-
-            // 3. 每5分钟自动刷新（仅在前台有效）
-            setInterval(() => {
-                if (document.visibilityState === 'visible') fetchData();
-            }, 300000);
-
+            searchInput.addEventListener('input', filterStocks);
+            setInterval(fetchData, 300000);
             tailwind.config = { content: ["./**/*.{html,js}"] };
         });
     </script>
